@@ -120,8 +120,13 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
             }
         }
 
-        if (initialData?.referenceDate) {
-            base.referenceDate = initialData.referenceDate.split('T')[0];
+        if (initialData) {
+            if (initialData.receiptDate) {
+                base.receiptDate = initialData.receiptDate.split('T')[0];
+            }
+            if (initialData.referenceDate) {
+                base.referenceDate = initialData.referenceDate.split('T')[0];
+            }
         }
 
         return { ...base, warehouseLocation: location };
