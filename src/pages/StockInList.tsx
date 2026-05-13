@@ -23,13 +23,59 @@ import { formatCurrency } from '@/utils/format';
 import { toast } from 'react-toastify';
 import { MESSAGES } from '@/configs/messages';
 import { TEXTS, MRT_VI } from '@/configs/texts';
+import { 
+    Grid2 as Grid, 
+    TextField, 
+    MenuItem, 
+    FormControl, 
+    InputLabel, 
+    Select 
+} from '@mui/material';
+import { Search as SearchIcon, ClearAll as ClearIcon } from '@mui/icons-material';
 
 const StockInList: React.FC = observer(() => {
-    const { stockInStore, modalStore } = rootStore;
+    const { stockInStore, modalStore, warehouseStore } = rootStore;
+
+    // Local state cho bộ lọc
+    const [filter, setFilter] = React.useState({
+        receiptNumber: '',
+        warehouseId: '',
+        startDate: '',
+        endDate: ''
+    });
+
+    useEffect(() => {
+        warehouseStore.fetchWarehouses();
+    }, [warehouseStore]);
 
     useEffect(() => {
         stockInStore.fetchList();
     }, [stockInStore.paging]);
+
+    const handleSearch = () => {
+        stockInStore.setObservable('keepSearchParams', {
+            ...filter,
+            receiptNumber: filter.receiptNumber || undefined,
+            warehouseId: filter.warehouseId || undefined,
+            startDate: filter.startDate || undefined,
+            endDate: filter.endDate || undefined
+        });
+        stockInStore.resetPaging();
+        stockInStore.fetchList();
+    };
+
+    const handleReset = () => {
+        const resetFilter = {
+            receiptNumber: '',
+            warehouseId: '',
+            startDate: '',
+            endDate: ''
+        };
+        setFilter(resetFilter);
+        stockInStore.setObservable('keepSearchParams', undefined);
+        stockInStore.resetPaging();
+        stockInStore.fetchList();
+    };
 
     const handleDelete = (id: string) => {
         modalStore.showAlertModal({
@@ -172,14 +218,6 @@ const StockInList: React.FC = observer(() => {
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button
-                        variant="outlined"
-                        startIcon={<RefreshIcon />}
-                        onClick={() => stockInStore.fetchList()}
-                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
-                    >
-                        Làm mới
-                    </Button>
-                    <Button
                         variant="contained"
                         startIcon={<AddIcon />}
                         onClick={handleAdd}
@@ -198,6 +236,80 @@ const StockInList: React.FC = observer(() => {
                 </Box>
             </Box>
 
+            <Paper sx={{ p: 2, mb: 2, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: 'white', flexShrink: 0 }}>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid size={{ xs: 12, md: 3 }}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label={TEXTS.TABLE.RECEIPT_NUMBER}
+                            value={filter.receiptNumber}
+                            onChange={(e) => setFilter({ ...filter, receiptNumber: e.target.value })}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 2 }}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel>{TEXTS.TABLE.WAREHOUSE}</InputLabel>
+                            <Select
+                                label={TEXTS.TABLE.WAREHOUSE}
+                                value={filter.warehouseId}
+                                onChange={(e) => setFilter({ ...filter, warehouseId: e.target.value })}
+                            >
+                                <MenuItem value=""><em>{TEXTS.COMMON.ALL_WAREHOUSE}</em></MenuItem>
+                                {warehouseStore.warehouses.map((w) => (
+                                    <MenuItem key={w.id} value={w.id}>{w.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 2 }}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            label={TEXTS.COMMON.FROM_DATE}
+                            InputLabelProps={{ shrink: true }}
+                            value={filter.startDate}
+                            onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 2 }}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            label={TEXTS.COMMON.TO_DATE}
+                            InputLabelProps={{ shrink: true }}
+                            value={filter.endDate}
+                            onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<SearchIcon />}
+                                onClick={handleSearch}
+                                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
+                            >
+                                {TEXTS.BUTTONS.SEARCH}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                startIcon={<ClearIcon />}
+                                onClick={handleReset}
+                                sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, minWidth: '110px' }}
+                            >
+                                {TEXTS.BUTTONS.RESET}
+                            </Button>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Paper>
+
             <Paper sx={{
                 borderRadius: 3,
                 overflow: 'hidden',
@@ -213,6 +325,7 @@ const StockInList: React.FC = observer(() => {
                     data={stockInStore.list}
                     enableColumnActions={false}
                     enableColumnFilters={false}
+                    enableGlobalFilter={false}
                     enablePagination={true}
                     enableSorting={true}
                     enableBottomToolbar={true}

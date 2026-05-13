@@ -135,9 +135,16 @@ export const TEXTS = {
     BUTTONS: {
         SAVE: 'Lưu phiếu nhập',
         CANCEL: 'Hủy bỏ',
+        SEARCH: 'Tìm kiếm',
+        RESET: 'Xóa lọc',
         CONFIRM: 'Đồng ý',
         AGREE_DELETE: 'Đồng ý xóa',
         CLOSE: 'Đóng',
+    },
+    COMMON: {
+        ALL_WAREHOUSE: 'Tất cả kho',
+        FROM_DATE: 'Từ ngày',
+        TO_DATE: 'Đến ngày',
     },
     TABLE: {
         RECEIPT_NUMBER: 'Số chứng từ',
