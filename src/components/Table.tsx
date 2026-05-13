@@ -46,7 +46,6 @@ export default function Table({
         enableColumnActions: false,
         enableSorting: false,
         enableTopToolbar: false,
-        // Localization for Vietnamese
         localization: {
             noRecordsToDisplay: 'Không có dữ liệu để hiển thị',
             rowsPerPage: 'Số dòng mỗi trang',

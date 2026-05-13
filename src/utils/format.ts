@@ -9,7 +9,7 @@ export const numberPriceToWordsInVnd = (amount: number | string | undefined | nu
     if (amount === undefined || amount === null || amount === '') return 'Không đồng';
 
     let num = typeof amount === 'string' ? parseInt(amount) : Math.floor(amount);
-    if (isNaN(num) || num === 0) return 'Không đồng';
+    if (isNaN(num) || num <= 0) return 'Không đồng';
 
     const units = ['', 'ngàn', 'triệu', 'tỷ', 'ngàn tỷ', 'triệu tỷ'];
     const digits = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
@@ -27,7 +27,7 @@ export const numberPriceToWordsInVnd = (amount: number | string | undefined | nu
         if (ten > 0) {
             if (ten === 1) res += 'mười ';
             else res += digits[ten] + ' mươi ';
-        } else if (hundred > 0 && unit > 0) {
+        } else if ((hundred > 0 || showZero) && unit > 0) {
             res += 'lẻ ';
         }
 
@@ -46,13 +46,18 @@ export const numberPriceToWordsInVnd = (amount: number | string | undefined | nu
     do {
         const threeDigits = num % 1000;
         if (threeDigits > 0) {
-            const part = readThreeDigits(threeDigits, unitIndex > 0 && num >= 1000);
+            const part = readThreeDigits(threeDigits, num >= 1000);
             words = part + ' ' + units[unitIndex] + ' ' + words;
+        } else if (num >= 1000 && words.trim().length > 0 && !words.trim().startsWith('không trăm')) {
+            words = 'không trăm ' + units[unitIndex] + ' ' + words;
         }
         num = Math.floor(num / 1000);
         unitIndex++;
     } while (num > 0);
 
-    const result = words.trim().charAt(0).toUpperCase() + words.trim().slice(1) + ' đồng';
-    return result.replace(/\s+/g, ' ');
+    const result = words.trim();
+    if (result.length === 0) return 'Không đồng';
+
+    const finalResult = result.charAt(0).toUpperCase() + result.slice(1) + ' đồng';
+    return finalResult.replace(/\s+/g, ' ');
 };

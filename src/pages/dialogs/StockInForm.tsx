@@ -27,7 +27,7 @@ import { isEqual } from 'lodash';
 import { TEXTS } from '@/configs/texts';
 import { MESSAGES } from '@/configs/messages';
 
-const validateSchema = yup.object().shape({
+export const validateSchema = yup.object().shape({
     receiptNumber: yup.string().max(50, TEXTS.VALIDATION.MAX_50).required(`${TEXTS.VALIDATION.REQUIRED} ${TEXTS.LABELS.RECEIPT_NUMBER.toLowerCase()}`),
     receiptDate: yup.string().required(`${TEXTS.VALIDATION.REQUIRED} ${TEXTS.LABELS.RECEIPT_DATE.toLowerCase()}`),
     companyName: yup.string().max(255, TEXTS.VALIDATION.MAX_255),
@@ -55,7 +55,7 @@ interface StockInFormProps {
 }
 
 const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave, onCancel }) => {
-    const { employeeStore, warehouseStore } = rootStore;
+    const { employeeStore, warehouseStore, stockInStore } = rootStore;
 
     useEffect(() => {
         employeeStore.fetchEmployees();
@@ -82,36 +82,7 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
     const keeperOptions = useMemo(() => getEmployeeOptions(POSITIONS.WAREHOUSE_KEEPER), [employeeStore.employees]);
     const allInternalOptions = useMemo(() => getEmployeeOptions(), [employeeStore.employees]);
 
-    const sanitizeData = (values: any) => {
-        const total = (values.items || []).reduce((sum: number, item: any) => {
-            return sum + (Number(item.quantityActual || 0) * Number(item.unitPrice || 0));
-        }, 0);
-
-        return {
-            receiptNumber: values.receiptNumber || '',
-            receiptDate: values.receiptDate || '',
-            companyName: values.companyName || '',
-            departmentName: values.departmentName || '',
-            debtAccount: values.debtAccount || '',
-            creditAccount: values.creditAccount || '',
-            creatorId: values.creatorId || '',
-            receiverId: values.receiverId || '',
-            warehouseKeeperId: values.warehouseKeeperId || '',
-            chiefAccountantId: values.chiefAccountantId || '',
-            warehouseId: values.warehouseId || '',
-            delivererName: values.delivererName || '',
-            note: values.note || '',
-            totalAmount: total,
-            items: (values.items || []).map((item: any) => ({
-                productCode: item.productCode || '',
-                productName: item.productName || '',
-                unit: item.unit || '',
-                quantityDocument: Number(item.quantityDocument || 0),
-                quantityActual: Number(item.quantityActual || 0),
-                unitPrice: Number(item.unitPrice || 0),
-            }))
-        };
-    };
+    const sanitizeData = (values: any) => stockInStore.sanitizeData(values);
 
     const defaultValues = useMemo(() => {
         const base = initialData || {
@@ -235,6 +206,7 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
                                                 const newItems = [...values.items, { productName: '', productCode: '', unit: '', quantityDocument: 0, quantityActual: 0, unitPrice: 0 }];
                                                 setFieldValue('items', newItems);
                                             }}
+                                            data-testid="add-item-button"
                                         >
                                             {TEXTS.STOCK_IN.ADD_ITEM}
                                         </Button>
@@ -260,7 +232,11 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
                                                             <FormField name={`items.${index}.productCode`} label="" placeholder="" />
                                                         </TableCell>
                                                         <TableCell sx={{ py: 1, px: 0.5 }} width="25%">
-                                                            <FormField name={`items.${index}.productName`} label="" placeholder="" />
+                                                            <FormField 
+                                                                name={`items.${index}.productName`} 
+                                                                label="" 
+                                                                placeholder={TEXTS.LABELS.PRODUCT_NAME} 
+                                                            />
                                                         </TableCell>
                                                         <TableCell sx={{ py: 1, px: 0.5 }} width="10%">
                                                             <FormField name={`items.${index}.unit`} label="" placeholder="" />
@@ -284,6 +260,7 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
                                                                         setFieldValue('items', newItems);
                                                                     }
                                                                 }}
+                                                                data-testid="delete-item-button"
                                                             >
                                                                 <TrashIcon fontSize="inherit" />
                                                             </IconButton>
