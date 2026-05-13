@@ -106,7 +106,7 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
             note: '',
             referenceType: '',
             referenceNumber: '',
-            referenceDate: null,
+            referenceDate: '',
             referenceIssuer: '',
             items: [{ productName: '', productCode: '', unit: '', quantityDocument: 0, quantityActual: 0, unitPrice: 0 }],
             totalAmount: 0,
@@ -126,6 +126,8 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
             }
             if (initialData.referenceDate) {
                 base.referenceDate = initialData.referenceDate.split('T')[0];
+            } else {
+                base.referenceDate = '';
             }
         }
 
