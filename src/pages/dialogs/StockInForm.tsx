@@ -38,6 +38,10 @@ export const validateSchema = yup.object().shape({
     creatorId: yup.string().required(`${TEXTS.VALIDATION.REQUIRED} ${TEXTS.LABELS.CREATOR.toLowerCase()}`),
     warehouseKeeperId: yup.string().required(`${TEXTS.VALIDATION.REQUIRED} ${TEXTS.LABELS.KEEPER.toLowerCase()}`),
     chiefAccountantId: yup.string().required(`${TEXTS.VALIDATION.REQUIRED} ${TEXTS.LABELS.ACCOUNTANT.toLowerCase()}`),
+    referenceType: yup.string().max(255, TEXTS.VALIDATION.MAX_255),
+    referenceNumber: yup.string().max(255, TEXTS.VALIDATION.MAX_255),
+    referenceDate: yup.string().nullable(),
+    referenceIssuer: yup.string().max(255, TEXTS.VALIDATION.MAX_255),
     items: yup.array().of(
         yup.object().shape({
             productName: yup.string().required(TEXTS.VALIDATION.PRODUCT_NAME_REQ),
@@ -100,6 +104,10 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
             warehouseKeeperId: '',
             chiefAccountantId: '',
             note: '',
+            referenceType: '',
+            referenceNumber: '',
+            referenceDate: null,
+            referenceIssuer: '',
             items: [{ productName: '', productCode: '', unit: '', quantityDocument: 0, quantityActual: 0, unitPrice: 0 }],
             totalAmount: 0,
         };
@@ -110,6 +118,10 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
             if (warehouse) {
                 location = warehouse.location || '';
             }
+        }
+
+        if (initialData?.referenceDate) {
+            base.referenceDate = initialData.referenceDate.split('T')[0];
         }
 
         return { ...base, warehouseLocation: location };
@@ -167,6 +179,20 @@ const StockInForm: React.FC<StockInFormProps> = observer(({ initialData, onSave,
                             </Grid>
                             <Grid size={{ xs: 12, md: 4 }}>
                                 <FormSelect name="receiverId" label={`${TEXTS.LABELS.RECEIVER} *`} options={allInternalOptions} />
+                            </Grid>
+
+                            {/* Reference Documents Row */}
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <FormField name="referenceType" label={TEXTS.LABELS.REFERENCE_TYPE} />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <FormField name="referenceNumber" label={TEXTS.LABELS.REFERENCE_NUMBER} />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <FormField name="referenceDate" label={TEXTS.LABELS.REFERENCE_DATE} type="date" />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <FormField name="referenceIssuer" label={TEXTS.LABELS.REFERENCE_ISSUER} />
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 3 }}>

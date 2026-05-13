@@ -40,10 +40,16 @@ describe('StockInForm Component', () => {
         vi.clearAllMocks();
     });
 
-    it('should render the form with initial state', () => {
+    it('should render the form with initial state and new reference fields', () => {
         renderWithProviders(<StockInForm onSave={mockOnSave} onCancel={mockOnCancel} />);
         
         expect(screen.getByText(TEXTS.STOCK_IN.FORM_HEADER)).toBeInTheDocument();
+        // Kiểm tra các trường mới
+        expect(screen.getByLabelText(TEXTS.LABELS.REFERENCE_TYPE)).toBeInTheDocument();
+        expect(screen.getByLabelText(TEXTS.LABELS.REFERENCE_NUMBER)).toBeInTheDocument();
+        expect(screen.getByLabelText(TEXTS.LABELS.REFERENCE_DATE)).toBeInTheDocument();
+        expect(screen.getByLabelText(TEXTS.LABELS.REFERENCE_ISSUER)).toBeInTheDocument();
+        
         // Kiểm tra xem có mặc định 1 dòng hàng hóa không
         expect(screen.getAllByPlaceholderText(TEXTS.LABELS.PRODUCT_NAME).length).toBe(1);
     });

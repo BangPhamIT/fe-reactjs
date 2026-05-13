@@ -127,6 +127,10 @@ export const TEXTS = {
         QTY_DOC: 'SL (Chứng từ)',
         QTY_ACTUAL: 'SL (Thực nhập)',
         PRICE: 'Đơn giá',
+        REFERENCE_TYPE: 'Theo',
+        REFERENCE_NUMBER: 'Số',
+        REFERENCE_DATE: 'Ngày',
+        REFERENCE_ISSUER: 'Của',
     },
     BUTTONS: {
         SAVE: 'Lưu phiếu nhập',

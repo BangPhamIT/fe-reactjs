@@ -77,6 +77,10 @@ export default class StockInStore extends ApiStore {
             chiefAccountantId: values.chiefAccountantId || '',
             warehouseId: values.warehouseId || '',
             delivererName: values.delivererName || '',
+            referenceType: values.referenceType || '',
+            referenceNumber: values.referenceNumber || '',
+            referenceDate: values.referenceDate || null,
+            referenceIssuer: values.referenceIssuer || '',
             note: values.note || '',
             totalAmount: total,
             items: (values.items || []).map((item: any) => ({
